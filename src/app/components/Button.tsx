@@ -1,4 +1,5 @@
 import React from "react";
+import { FaHome, FaChartBar, FaCompass, FaUser } from "react-icons/fa";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     children: React.ReactNode;

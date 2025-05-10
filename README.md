@@ -78,3 +78,24 @@ create trigger trg_sync_auth_user
   after insert on auth.users
   for each row
   execute procedure public.sync_auth_user_to_profiles();
+
+-- 5) SECURITY DEFINER trigger function (no SET ROLE)
+create or replace function public.sync_auth_user_to_profiles()
+returns trigger
+language plpgsql
+security definer
+as $$
+begin
+  insert into public.profiles(email, user_id)
+    values (new.email, new.id)
+    on conflict (email) do nothing;
+  return new;
+end;
+$$;
+
+-- 6) Attach the trigger (drop existing if present)
+drop trigger if exists trg_sync_auth_user on auth.users;
+create trigger trg_sync_auth_user
+  after insert on auth.users
+  for each row
+  execute procedure public.sync_auth_user_to_profiles();

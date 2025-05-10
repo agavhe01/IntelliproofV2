@@ -1,16 +1,14 @@
 "use client";
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import ContinueButton from "./ContinueButton";
 import Input from "./Input";
 import { useRouter } from "next/navigation";
 import { supabase } from "../utils/supabase";
 import PasswordToggleButton from "./PasswordToggleButton";
 
-export default function SignupForm() {
-    const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "" });
+export default function SigninForm() {
+    const [form, setForm] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
@@ -22,35 +20,20 @@ export default function SignupForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-        setSuccess("");
         setLoading(true);
-        const { error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signInWithPassword({
             email: form.email,
             password: form.password,
-            options: {
-                data: {
-                    first_name: form.firstName,
-                    last_name: form.lastName,
-                },
-            },
         });
         setLoading(false);
         if (error) setError(error.message);
-        else router.push("/onboarding1");
+        else router.push("/home");
     };
 
     return (
         <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 p-8 rounded-lg">
-            <h2 className="text-2xl font-semibold text-white mb-2">Account Sign Up</h2>
-            <p className="text-zinc-400 text-sm mb-6">Enter your information below</p>
-            <div className="flex flex-col gap-4">
-                <label className="text-zinc-300 text-sm font-medium" htmlFor="firstName">First Name</label>
-                <Input id="firstName" name="firstName" placeholder="e.g. John" value={form.firstName} onChange={handleChange} required />
-            </div>
-            <div className="flex flex-col gap-4">
-                <label className="text-zinc-300 text-sm font-medium" htmlFor="lastName">Last Name</label>
-                <Input id="lastName" name="lastName" placeholder="e.g. Doe" value={form.lastName} onChange={handleChange} required />
-            </div>
+            <h2 className="text-2xl font-semibold text-white mb-2">Sign In</h2>
+            <p className="text-zinc-400 text-sm mb-6">Enter your credentials below</p>
             <div className="flex flex-col gap-4">
                 <label className="text-zinc-300 text-sm font-medium" htmlFor="email">Email</label>
                 <Input id="email" name="email" type="email" placeholder="e.g. jdoe@gmail.com" value={form.email} onChange={handleChange} required />
@@ -61,11 +44,10 @@ export default function SignupForm() {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Password (must be at least 8 characters)"
+                    placeholder="Password"
                     value={form.password}
                     onChange={handleChange}
                     required
-                    minLength={8}
                     className="pr-12"
                 />
                 <PasswordToggleButton show={showPassword} onClick={() => setShowPassword((v) => !v)} />
@@ -76,11 +58,10 @@ export default function SignupForm() {
                 disabled={loading}
                 className="mt-4"
             >
-                Sign Up
+                Sign In
             </ContinueButton>
             {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-            {success && <p className="text-green-500 text-sm mt-2">{success}</p>}
-            <p className="text-zinc-400 mt-6 text-center">Already have an account? <a href="/signin" className="text-white underline">Log in</a></p>
+            <p className="text-zinc-400 mt-6 text-center">Don't have an account? <a href="/signup" className="text-white underline">Sign Up</a></p>
         </form>
     );
 } 

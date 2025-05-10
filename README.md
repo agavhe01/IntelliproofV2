@@ -99,3 +99,21 @@ create trigger trg_sync_auth_user
   after insert on auth.users
   for each row
   execute procedure public.sync_auth_user_to_profiles();
+
+
+  alter table public.profiles
+  add column avatar_url text;
+
+alter table public.profiles
+  add column instagram_url text;
+
+alter table public.profiles
+  add column linkedin_url text;
+
+alter table public.profiles
+  add column twitter_url text;
+
+alter table public.profiles
+  add column bio text;
+
+alter table public.profiles add column last_login timestamp default CURRENT_TIMESTAMP; 

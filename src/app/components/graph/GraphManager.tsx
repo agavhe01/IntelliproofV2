@@ -3,16 +3,26 @@ import { supabase } from '../../utils/supabase';
 import { ArgumentGraph } from '../../types/graph';
 import { Modal } from '../Modal';
 import Image from 'next/image';
+import { format } from 'date-fns';
 
 interface GraphManagerProps {
     onSelectGraph: (graph: ArgumentGraph) => void;
     onNewGraph: () => void;
 }
 
+interface GraphData {
+    id: string;
+    name?: string;
+    graph_data: ArgumentGraph;
+    created_at: string;
+    updated_at: string;
+    owner_email: string;
+}
+
 export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManagerProps) {
-    const [graphs, setGraphs] = useState<Array<{ id: string; name?: string; graph_data: ArgumentGraph }>>([]);
+    const [graphs, setGraphs] = useState<GraphData[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedGraph, setSelectedGraph] = useState<{ id: string; name?: string; graph_data: ArgumentGraph } | null>(null);
+    const [selectedGraph, setSelectedGraph] = useState<GraphData | null>(null);
 
     useEffect(() => {
         console.log('GraphManager mounted');
@@ -49,14 +59,18 @@ export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManager
         }
     };
 
-    const handleSelectGraph = (graph: { id: string; name?: string; graph_data: ArgumentGraph }) => {
+    const handleSelectGraph = (graph: GraphData) => {
         console.log('Selected graph:', graph);
         setSelectedGraph(graph);
     };
 
     const handleOpenGraph = () => {
         if (selectedGraph) {
-            onSelectGraph(selectedGraph.graph_data);
+            const graphWithName = {
+                ...selectedGraph.graph_data,
+                name: selectedGraph.name
+            };
+            onSelectGraph(graphWithName);
             setSelectedGraph(null);
         }
     };
@@ -123,8 +137,26 @@ export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManager
                                                 <div className="text-xl font-semibold">{graph.graph_data.edges.length}</div>
                                             </div>
                                         </div>
+                                        <div className="space-y-3 mt-4">
+                                            <div className="bg-zinc-800 p-4 rounded-lg">
+                                                <div className="text-sm text-zinc-400">Created On</div>
+                                                <div className="text-sm font-medium">
+                                                    {format(new Date(graph.created_at), 'PPP p')}
+                                                </div>
+                                            </div>
+                                            <div className="bg-zinc-800 p-4 rounded-lg">
+                                                <div className="text-sm text-zinc-400">Last Modified</div>
+                                                <div className="text-sm font-medium">
+                                                    {format(new Date(graph.updated_at), 'PPP p')}
+                                                </div>
+                                            </div>
+                                            <div className="bg-zinc-800 p-4 rounded-lg">
+                                                <div className="text-sm text-zinc-400">Created By</div>
+                                                <div className="text-sm font-medium">{graph.owner_email}</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-end gap-4 p-4 border-t border-zinc-800">
+                                    <div className="flex justify-end gap-4 p-4 border-t border-zinc-800 mt-4">
                                         <button
                                             onClick={() => setSelectedGraph(null)}
                                             className="px-2 py-1 bg-gray-200 text-black dark:bg-black dark:border-black dark:text-white border border-gray-300 rounded-md text-sm w-28"

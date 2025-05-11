@@ -58,7 +58,9 @@ create table public.graphs (
   id           uuid       primary key default gen_random_uuid(),
   owner_email  text       not null      references public.profiles(email) on delete cascade,
   graph_data   jsonb      not null,
-  created_at   timestamp with time zone not null default now()
+  created_at   timestamp with time zone not null default now(),
+  updated_at   timestamp with time zone not null default now(),
+  name         text
 );
 
 -- Optional: speed up searches inside JSONB

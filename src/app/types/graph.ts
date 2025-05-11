@@ -17,4 +17,5 @@ export interface Edge {
 export interface ArgumentGraph {
     nodes: Node[];
     edges: Edge[];
+    name?: string;
 } 

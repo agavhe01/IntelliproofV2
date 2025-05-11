@@ -25,6 +25,7 @@ export default function GraphEditor() {
     const [selectedEdge, setSelectedEdge] = useState<ArgumentEdge | null>(null);
     const [showManager, setShowManager] = useState(true);
     const [currentGraphId, setCurrentGraphId] = useState<string | null>(null);
+    const [graphName, setGraphName] = useState<string>('Untitled Graph');
 
     useEffect(() => {
         console.log('GraphEditor mounted');
@@ -200,6 +201,7 @@ export default function GraphEditor() {
         const insertObj: any = {
             owner_email: user.email,
             graph_data: graphData,
+            name: graphName,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
         };
@@ -241,6 +243,7 @@ export default function GraphEditor() {
 
         setNodes(flowNodes);
         setEdges(flowEdges);
+        setGraphName(graph.name || 'Untitled Graph');
         setShowManager(false);
     };
 
@@ -249,6 +252,7 @@ export default function GraphEditor() {
         setNodes([]);
         setEdges([]);
         setCurrentGraphId(null);
+        setGraphName('Untitled Graph');
         setShowManager(false);
     };
 
@@ -346,6 +350,16 @@ export default function GraphEditor() {
             {!showManager && (
                 <div className="w-80 bg-zinc-900 p-4 border-l border-zinc-800 overflow-y-auto">
                     <div className="space-y-6">
+                        <div>
+                            <h2 className="text-xl font-semibold text-white mb-4">Graph Name</h2>
+                            <input
+                                type="text"
+                                value={graphName}
+                                onChange={(e) => setGraphName(e.target.value)}
+                                className="w-full bg-zinc-800 text-white px-3 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500"
+                                placeholder="Enter graph name"
+                            />
+                        </div>
                         <div>
                             <h2 className="text-xl font-semibold text-white mb-4">Add Node</h2>
                             <div className="space-y-2">

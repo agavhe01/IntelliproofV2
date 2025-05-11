@@ -12,6 +12,8 @@ export default function EditProfile({ profile, onSave }: { profile: any, onSave?
     const [linkedin, setLinkedin] = useState(profile?.linkedin_url || "");
     const [twitter, setTwitter] = useState(profile?.twitter_url || "");
     const [instagram, setInstagram] = useState(profile?.instagram_url || "");
+    const [firstName, setFirstName] = useState(profile?.first_name || "");
+    const [lastName, setLastName] = useState(profile?.last_name || "");
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,6 +50,8 @@ export default function EditProfile({ profile, onSave }: { profile: any, onSave?
                 linkedin_url: linkedin,
                 twitter_url: twitter,
                 instagram_url: instagram,
+                first_name: firstName,
+                last_name: lastName,
             })
             .eq("email", profile.email);
         if (updateError) {
@@ -87,7 +91,21 @@ export default function EditProfile({ profile, onSave }: { profile: any, onSave?
                         <span className="text-xs text-zinc-400 mt-2">Add a clear photo</span>
                     </div>
                     <div className="flex-1 flex flex-col gap-4">
-                        <label className="text-zinc-300 text-sm font-medium">Bio</label>
+                        <label className="text-zinc-300 text-sm font-medium">First Name</label>
+                        <input
+                            className="bg-black border border-zinc-800 rounded-lg p-3 text-white"
+                            value={firstName}
+                            onChange={e => setFirstName(e.target.value)}
+                            placeholder="Your first name"
+                        />
+                        <label className="text-zinc-300 text-sm font-medium mt-2">Last Name</label>
+                        <input
+                            className="bg-black border border-zinc-800 rounded-lg p-3 text-white"
+                            value={lastName}
+                            onChange={e => setLastName(e.target.value)}
+                            placeholder="Your last name"
+                        />
+                        <label className="text-zinc-300 text-sm font-medium mt-2">Bio</label>
                         <textarea
                             className="bg-black border border-zinc-800 rounded-lg p-3 text-white resize-none min-h-[80px]"
                             value={bio}

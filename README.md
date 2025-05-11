@@ -48,7 +48,9 @@ create table public.profiles (
   user_id      uuid       not null    references auth.users(id) on delete cascade,
   account_type account_type_enum      not null default 'free',
   country      varchar(50),                   -- nullable by default
-  created_at   timestamp with time zone not null default now()
+  created_at   timestamp with time zone not null default now(),
+  first name text, 
+  last name text,
 );
 
 -- 4) Create graphs, now referencing profiles(email)
@@ -86,8 +88,13 @@ language plpgsql
 security definer
 as $$
 begin
-  insert into public.profiles(email, user_id)
-    values (new.email, new.id)
+  insert into public.profiles(email, user_id, first_name, last_name)
+    values (
+      new.email, 
+      new.id,
+      new.raw_user_meta_data->>'first_name',
+      new.raw_user_meta_data->>'last_name'
+    )
     on conflict (email) do nothing;
   return new;
 end;
@@ -117,3 +124,25 @@ alter table public.profiles
   add column bio text;
 
 alter table public.profiles add column last_login timestamp default CURRENT_TIMESTAMP; 
+
+
+ALTER TABLE public.graphs ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.graphs 
+ADD COLUMN updated_at timestamp with time zone DEFAULT current_timestamp;
+
+alter table profiles add column first_name text;
+
+CREATE OR REPLACE FUNCTION insert_profile(display_name text)
+RETURNS void AS $$
+DECLARE
+  first_name text;
+  last_name  text;
+BEGIN
+  first_name := split_part(display_name, ' ', 1);
+  last_name  := split_part(display_name, ' ', 2);
+
+  INSERT INTO public.profiles (first_name, last_name)
+  VALUES (first_name, last_name);
+END;
+$$ LANGUAGE plpgsql;

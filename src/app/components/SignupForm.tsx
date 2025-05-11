@@ -24,19 +24,79 @@ export default function SignupForm() {
         setError("");
         setSuccess("");
         setLoading(true);
-        const { error } = await supabase.auth.signUp({
-            email: form.email,
-            password: form.password,
-            options: {
+
+        try {
+            // Validate input
+            if (!form.email || !form.password || !form.firstName || !form.lastName) {
+                throw new Error('All fields are required');
+            }
+
+            if (form.password.length < 8) {
+                throw new Error('Password must be at least 8 characters long');
+            }
+
+            // First, sign up the user with minimal data
+            const { data: authData, error: signUpError } = await supabase.auth.signUp({
+                email: form.email.toLowerCase().trim(),
+                password: form.password,
+            });
+
+            if (signUpError) {
+                console.error('Auth signup error:', signUpError);
+                throw new Error(signUpError.message || 'Failed to create account');
+            }
+
+            if (!authData.user?.id) {
+                throw new Error('User creation failed - no user ID returned');
+            }
+
+            // Wait a moment to ensure the auth user is fully created
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Update user metadata
+            const { error: updateError } = await supabase.auth.updateUser({
                 data: {
-                    first_name: form.firstName,
-                    last_name: form.lastName,
-                },
-            },
-        });
-        setLoading(false);
-        if (error) setError(error.message);
-        else router.push("/onboarding1");
+                    first_name: form.firstName.trim(),
+                    last_name: form.lastName.trim(),
+                }
+            });
+
+            if (updateError) {
+                console.error('Metadata update error:', updateError);
+                // Continue anyway as this is not critical
+            }
+
+            // Then, insert into profiles table
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert({
+                    email: form.email.toLowerCase().trim(),
+                    user_id: authData.user.id,
+                    first_name: form.firstName.trim(),
+                    last_name: form.lastName.trim(),
+                    account_type: 'free',
+                    created_at: new Date().toISOString()
+                });
+
+            if (profileError) {
+                console.error('Profile creation error:', profileError);
+                // If profile creation fails, we should clean up the auth user
+                try {
+                    await supabase.auth.admin.deleteUser(authData.user.id);
+                } catch (deleteError) {
+                    console.error('Error cleaning up auth user:', deleteError);
+                }
+                throw new Error('Failed to create profile. Please try again.');
+            }
+
+            setSuccess('Account created successfully! Please check your email to verify your account.');
+            router.push("/onboarding1");
+        } catch (error: any) {
+            console.error('Signup error:', error);
+            setError(error.message || 'An error occurred during signup');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

@@ -5,6 +5,8 @@ import Image from "next/image";
 import { FaSignOutAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import Carousel from "../components/Carousel";
+import AnimatedText from "../components/AnimatedText";
+import Services from '../components/Services';
 
 const NAV_ITEMS = [
     { key: "home", label: "Home", icon: null },
@@ -102,10 +104,10 @@ export default function HomePage() {
                 {selectedTab === "home" && (
                     <div className="flex-1 flex flex-col">
                         <div className="p-8">
-                            <h1 className="text-2xl font-bold text-white">Welcome to Intelliproof</h1>
-                            <p className="text-zinc-300 mt-4">
-                                Select a tab from the sidebar to get started with your argument mapping journey.
-                            </p>
+                            <AnimatedText />
+                        </div>
+                        <div className="px-8 pb-8">
+                            <Services />
                         </div>
                     </div>
                 )}

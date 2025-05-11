@@ -12,6 +12,10 @@ const NAV_ITEMS = [
 ];
 
 const ProfilePage = dynamic(() => import("../profile/page"), { ssr: false });
+const GraphEditor = dynamic(() => import("../components/graph/GraphEditor"), {
+    ssr: false,
+    loading: () => <div className="text-white p-4">Loading Graph Editor...</div>
+});
 
 export default function HomePage() {
     const [user, setUser] = useState<any>(null);
@@ -66,7 +70,6 @@ export default function HomePage() {
               `}
                             onClick={() => setSelectedTab(item.key)}
                         >
-                            {/* Optionally add icons here */}
                             {item.label}
                         </button>
                     ))}
@@ -82,16 +85,28 @@ export default function HomePage() {
                     </button>
                 </div>
             </div>
-            {/* Main Content is rendered to the right of the sidebar/header */}
+            {/* Main Content Area */}
             <div className="flex-1 flex flex-col">
-                {/* Top Bar (Welcome header) is rendered by Navbar */}
-                {/* Main Content Area */}
                 {selectedTab === "profile" && (
                     <div className="flex-1 flex flex-col">
                         <ProfilePage />
                     </div>
                 )}
-                {/* You can add other tab content here */}
+                {selectedTab === "graph" && (
+                    <div className="flex-1 flex flex-col">
+                        <GraphEditor />
+                    </div>
+                )}
+                {selectedTab === "home" && (
+                    <div className="flex-1 flex flex-col">
+                        <div className="p-8">
+                            <h1 className="text-2xl font-bold text-white">Welcome to Intelliproof</h1>
+                            <p className="text-zinc-300 mt-4">
+                                Select a tab from the sidebar to get started with your argument mapping journey.
+                            </p>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -5,7 +5,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const images = [
     { src: "/images/grok.png", alt: "Grok", desc: "Grok is xAI's real-time generative AI model built to integrate with the X platform, delivering concise answers, coding assistance, and conversation directly in your social feed", link: "https://x.ai/grok" },
-    { src: "/images/deepseek.png", alt: "Deepseek", desc: "Deepseek is a deep-learning–driven semantic search engine designed to understand user intent and surface the most relevant documents or multimedia across disparate data sources", link: "https://www.deepseek.com/" },
+    { src: "/images/deepseek.png", alt: "Deepseek", desc: "Deepseek is a deep-learning–driven search engine designed to understand user intent and surface the most relevant documents or multimedia across disparate data sources", link: "https://www.deepseek.com/" },
     { src: "/images/gpt.png", alt: "GPT", desc: "OpenAI's flagship series of large language models that use a transformer architecture to generate coherent, context-aware text across a wide range of tasks", link: "https://openai.com/gpt-4" },
     { src: "/images/gemini.png", alt: "Gemini", desc: "Gemini is Google DeepMind's next-generation multimodal AI family, capable of processing and generating text, images, audio, and code.", link: "https://deepmind.google/technologies/gemini/" },
 ];

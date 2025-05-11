@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabase';
 import { ArgumentGraph } from '../../types/graph';
+import { Modal } from '../Modal';
+import Image from 'next/image';
 
 interface GraphManagerProps {
     onSelectGraph: (graph: ArgumentGraph) => void;
@@ -8,23 +10,21 @@ interface GraphManagerProps {
 }
 
 export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManagerProps) {
-    console.log('GraphManager component rendering');
-
-    const [graphs, setGraphs] = useState<Array<{ id: string; graph_data: ArgumentGraph }>>([]);
+    const [graphs, setGraphs] = useState<Array<{ id: string; name?: string; graph_data: ArgumentGraph }>>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedGraph, setSelectedGraph] = useState<{ id: string; name?: string; graph_data: ArgumentGraph } | null>(null);
 
     useEffect(() => {
         console.log('GraphManager mounted');
         loadGraphs();
-        return () => {
-            console.log('GraphManager unmounted');
-        };
     }, []);
 
     const loadGraphs = async () => {
         console.log('Loading graphs...');
         try {
             const { data: { user } } = await supabase.auth.getUser();
+            console.log('Current user:', user);
+
             if (!user) {
                 console.log('No user found');
                 return;
@@ -49,12 +49,19 @@ export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManager
         }
     };
 
-    const handleSelectGraph = (graph: { id: string; graph_data: ArgumentGraph }) => {
+    const handleSelectGraph = (graph: { id: string; name?: string; graph_data: ArgumentGraph }) => {
         console.log('Selected graph:', graph);
-        onSelectGraph(graph.graph_data);
+        setSelectedGraph(graph);
     };
 
-    console.log('Current state:', { loading, graphsCount: graphs.length });
+    const handleOpenGraph = () => {
+        if (selectedGraph) {
+            onSelectGraph(selectedGraph.graph_data);
+            setSelectedGraph(null);
+        }
+    };
+
+    console.log('Current state:', { loading, graphsCount: graphs.length, graphs });
 
     if (loading) {
         return <div className="text-white p-4">Loading graphs...</div>;
@@ -73,22 +80,69 @@ export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManager
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {graphs.map((graph) => (
-                    <div
-                        key={graph.id}
-                        className="bg-zinc-800 rounded-lg p-4 hover:bg-zinc-700 transition-colors cursor-pointer"
-                        onClick={() => handleSelectGraph(graph)}
-                    >
-                        <div className="flex justify-between items-start mb-2">
-                            <h3 className="text-white font-medium">
-                                {graph.graph_data.nodes.length} nodes
-                            </h3>
+                {graphs.map((graph) => {
+                    console.log('Rendering graph:', graph);
+                    return (
+                        <div key={graph.id}>
+                            <div
+                                className="relative w-[400px] h-auto rounded-lg overflow-hidden cursor-pointer"
+                                style={{ aspectRatio: "3/2" }}
+                                onClick={() => handleSelectGraph(graph)}
+                            >
+                                <Image
+                                    className="absolute w-full h-full top-0 left-0 hover:scale-[1.05] transition-all"
+                                    src="/graphIcon.png"
+                                    alt={graph.name || 'Untitled Graph'}
+                                    width={300}
+                                    height={300}
+                                />
+                                <div className="absolute w-full h-1/2 bottom-0 left-0 bg-gradient-to-t from-black via-black/85 to-transparent pointer-events-none">
+                                    <div className="flex flex-col h-full items-start justify-end p-6">
+                                        <div className="text-lg text-left text-white">{graph.name || 'Untitled Graph'}</div>
+                                        <div className="text-xs bg-white text-black rounded-lg w-fit px-2">
+                                            {graph.graph_data.nodes.length} nodes, {graph.graph_data.edges.length} connections
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Modal
+                                isOpen={selectedGraph?.id === graph.id}
+                                onClose={() => setSelectedGraph(null)}
+                            >
+                                <div className="p-6">
+                                    <div className="text-white">
+                                        <h3 className="text-2xl font-bold mb-4">{graph.name || 'Untitled Graph'}</h3>
+                                        <div className="grid grid-cols-2 gap-4 mb-4">
+                                            <div className="bg-zinc-800 p-4 rounded-lg">
+                                                <div className="text-sm text-zinc-400">Nodes</div>
+                                                <div className="text-xl font-semibold">{graph.graph_data.nodes.length}</div>
+                                            </div>
+                                            <div className="bg-zinc-800 p-4 rounded-lg">
+                                                <div className="text-sm text-zinc-400">Connections</div>
+                                                <div className="text-xl font-semibold">{graph.graph_data.edges.length}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end gap-4 p-4 border-t border-zinc-800">
+                                        <button
+                                            onClick={() => setSelectedGraph(null)}
+                                            className="px-2 py-1 bg-gray-200 text-black dark:bg-black dark:border-black dark:text-white border border-gray-300 rounded-md text-sm w-28"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleOpenGraph}
+                                            className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28"
+                                        >
+                                            Open
+                                        </button>
+                                    </div>
+                                </div>
+                            </Modal>
                         </div>
-                        <div className="mt-2 text-sm text-zinc-300">
-                            {graph.graph_data.edges.length} connections
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {graphs.length === 0 && (

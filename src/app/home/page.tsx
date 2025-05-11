@@ -4,11 +4,13 @@ import { supabase } from "../utils/supabase";
 import Image from "next/image";
 import { FaSignOutAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
+import Carousel from "../components/Carousel";
 
 const NAV_ITEMS = [
     { key: "home", label: "Home", icon: null },
     { key: "graph", label: "Graph Editor", icon: null },
     { key: "profile", label: "Profile", icon: null },
+    { key: "models", label: "Models", icon: null },
 ];
 
 const ProfilePage = dynamic(() => import("../profile/page"), { ssr: false });
@@ -104,6 +106,14 @@ export default function HomePage() {
                             <p className="text-zinc-300 mt-4">
                                 Select a tab from the sidebar to get started with your argument mapping journey.
                             </p>
+                        </div>
+                    </div>
+                )}
+                {selectedTab === "models" && (
+                    <div className="flex-1 flex flex-col">
+                        <div className="flex-1 flex flex-col">
+                            {/* Carousel goes here */}
+                            <Carousel />
                         </div>
                     </div>
                 )}

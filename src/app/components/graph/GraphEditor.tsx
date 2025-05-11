@@ -259,9 +259,16 @@ export default function GraphEditor() {
         let color = 'gray';
         if (argEdge.weight > 0) color = 'blue';
         else if (argEdge.weight < 0) color = 'red';
+
+        const isSelected = selectedEdge?.id === edge.id;
         return {
             ...edge,
-            style: { stroke: color, strokeWidth: 3 },
+            style: {
+                stroke: color,
+                strokeWidth: isSelected ? 6 : 3,
+                transition: 'all 0.2s ease-in-out',
+                filter: isSelected ? `drop-shadow(0 0 8px ${color})` : 'none'
+            },
         };
     });
 

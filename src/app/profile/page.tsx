@@ -103,21 +103,20 @@ export default function ProfilePage() {
                             </div>
                         )}
                         <div>
-                            {/* Email is now only in details, not as header */}
                             <p className="text-zinc-400">{profile.email}</p>
                             <p className="text-zinc-400">{profile.country}</p>
                             <p className="text-zinc-400">Joined: {joinedOn}</p>
                             <p className="text-zinc-400">Account: {profile.account_type}</p>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-2 items-end">
+                    <div className="flex flex-col gap-2">
                         <button
-                            className="flex items-center gap-2 bg-zinc-800 px-4 py-2 rounded-lg hover:bg-zinc-700 transition-colors text-sm font-medium"
+                            className="w-32 flex items-center justify-center gap-2 bg-zinc-800 px-4 py-2 rounded-lg hover:bg-zinc-700 transition-colors text-sm font-medium"
                             onClick={() => router.push("/profile/edit")}
                         >
                             <FaEdit /> Edit Profile
                         </button>
-                        <button className="flex items-center gap-2 bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                        <button className="w-32 flex items-center justify-center gap-2 bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
                             <FaSignOutAlt /> Sign Out
                         </button>
                     </div>
@@ -137,15 +136,6 @@ export default function ProfilePage() {
                     <div className="bg-zinc-800 rounded-lg p-4">
                         <p className="font-semibold">Last Active</p>
                         <p>{lastActive}</p>
-                    </div>
-                    <div className="bg-zinc-800 rounded-lg p-4 col-span-2">
-                        <p className="font-semibold mb-4">Recent Graphs</p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {graphs.slice(0, 6).map((g) => (
-                                <ProjectCard key={g.id} graph={g} />
-                            ))}
-                            {graphs.length === 0 && <p className="text-zinc-400 col-span-full">No graphs yet.</p>}
-                        </div>
                     </div>
                     <div className="bg-zinc-800 rounded-lg p-4 col-span-2">
                         <p className="font-semibold">Storage Used</p>

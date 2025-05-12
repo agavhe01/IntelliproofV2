@@ -197,7 +197,7 @@ export default function GraphEditor() {
                 belief: node.data.belief,
                 author: node.data.author,
                 created_on: node.data.created_on,
-                position: node.position
+                position: node.position // Use the current position from the node
             })),
             edges: edges.map(edge => ({
                 id: edge.id,
@@ -266,8 +266,11 @@ export default function GraphEditor() {
         const flowNodes: FlowNode<Node>[] = graph.nodes.map((node) => ({
             id: node.id,
             type: 'argument',
-            position: node.position || { x: 100, y: 100 }, // Use saved position or default
-            data: node,
+            position: node.position || { x: 100, y: 100 }, // Only use default if no position exists
+            data: {
+                ...node,
+                position: node.position || { x: 100, y: 100 } // Ensure position is in data as well
+            }
         }));
 
         const flowEdges = graph.edges.map(edge => ({
@@ -341,29 +344,6 @@ export default function GraphEditor() {
 
     const liveSelectedEdge = selectedEdge ? edges.find(e => e.id === selectedEdge.id) as ArgumentEdge : null;
 
-    // DAGRE LAYOUT FUNCTION
-    const applyAutoLayout = useCallback(() => {
-        const g = new dagre.graphlib.Graph();
-        g.setDefaultEdgeLabel(() => ({}));
-        g.setGraph({ rankdir: 'LR', nodesep: 100, ranksep: 100 });
-
-        nodes.forEach((node) => {
-            g.setNode(node.id, { width: 200, height: 100 });
-        });
-        edges.forEach((edge) => {
-            g.setEdge(edge.source, edge.target);
-        });
-        dagre.layout(g);
-        const newNodes = nodes.map((node) => {
-            const dagreNode = g.node(node.id);
-            return {
-                ...node,
-                position: dagreNode ? { x: dagreNode.x - 100, y: dagreNode.y - 50 } : node.position,
-            };
-        });
-        setNodes(newNodes);
-    }, [nodes, edges, setNodes]);
-
     // FORCE-DIRECTED LAYOUT FUNCTION (simple, not physics-accurate)
     const applyForceLayout = useCallback(() => {
         const width = 800;
@@ -402,14 +382,49 @@ export default function GraphEditor() {
             });
         }
         // Center and scale
-        nodePositions = nodePositions.map(n => ({
+        const newNodes = nodePositions.map(n => ({
             ...n,
             position: {
                 x: centerX + (n.fx - centerX) * 0.7,
                 y: centerY + (n.fy - centerY) * 0.7,
+            },
+            data: {
+                ...n.data,
+                position: {
+                    x: centerX + (n.fx - centerX) * 0.7,
+                    y: centerY + (n.fy - centerY) * 0.7,
+                }
             }
         }));
-        setNodes(nodePositions.map(({ fx, fy, ...n }) => n));
+        setNodes(newNodes);
+    }, [nodes, edges, setNodes]);
+
+    // DAGRE LAYOUT FUNCTION
+    const applyAutoLayout = useCallback(() => {
+        const g = new dagre.graphlib.Graph();
+        g.setDefaultEdgeLabel(() => ({}));
+        g.setGraph({ rankdir: 'LR', nodesep: 100, ranksep: 100 });
+
+        nodes.forEach((node) => {
+            g.setNode(node.id, { width: 200, height: 100 });
+        });
+        edges.forEach((edge) => {
+            g.setEdge(edge.source, edge.target);
+        });
+        dagre.layout(g);
+        const newNodes = nodes.map((node) => {
+            const dagreNode = g.node(node.id);
+            const position = dagreNode ? { x: dagreNode.x - 100, y: dagreNode.y - 50 } : node.position;
+            return {
+                ...node,
+                position,
+                data: {
+                    ...node.data,
+                    position
+                }
+            };
+        });
+        setNodes(newNodes);
     }, [nodes, edges, setNodes]);
 
     // CIRCULAR LAYOUT FUNCTION
@@ -418,13 +433,20 @@ export default function GraphEditor() {
         const centerX = 500;
         const centerY = 300;
         const angleStep = (2 * Math.PI) / nodes.length;
-        const newNodes = nodes.map((node, i) => ({
-            ...node,
-            position: {
+        const newNodes = nodes.map((node, i) => {
+            const position = {
                 x: centerX + radius * Math.cos(i * angleStep),
                 y: centerY + radius * Math.sin(i * angleStep),
-            }
-        }));
+            };
+            return {
+                ...node,
+                position,
+                data: {
+                    ...node.data,
+                    position
+                }
+            };
+        });
         setNodes(newNodes);
     }, [nodes, setNodes]);
 

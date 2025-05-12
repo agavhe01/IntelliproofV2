@@ -203,7 +203,7 @@ export default function GraphEditor() {
                 id: edge.id,
                 source: edge.source,
                 target: edge.target,
-                weight: (edge as any).weight || 0.5
+                weight: (edge as ArgumentEdge).weight || 0.5
             }))
         };
 
@@ -255,7 +255,7 @@ export default function GraphEditor() {
             }
 
             setShowManager(true);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Error in saveGraph:', error);
             alert('An error occurred while saving the graph.');
         }

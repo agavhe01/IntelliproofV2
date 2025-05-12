@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import Image from "next/image";
 import Input from "./Input";
 
 export type Country = {
@@ -45,7 +46,13 @@ export default function CountrySelect({ countries, value, onChange }: CountrySel
                                 className={`flex items-center gap-4 p-5 rounded-xl border-2 shadow transition-all w-full text-left focus:outline-none focus:ring-2 focus:ring-white
                                     ${value === country.code ? "border-white bg-zinc-800" : "border-zinc-700 bg-zinc-900 hover:border-white"}`}
                             >
-                                <img src={country.flag} alt={country.name + ' flag'} className="w-8 h-8 rounded" />
+                                <Image
+                                    src={country.flag}
+                                    alt={country.name + ' flag'}
+                                    width={32}
+                                    height={32}
+                                    className="rounded"
+                                />
                                 <span className="text-white text-lg font-medium">{country.name}</span>
                                 <span className="ml-auto text-zinc-400 text-sm font-mono">{country.code}</span>
                             </button>

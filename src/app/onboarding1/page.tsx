@@ -57,7 +57,7 @@ export default function Onboarding1() {
             <div className="flex-1 flex flex-col items-center justify-center px-4">
                 <div className="w-full max-w-2xl min-h-[600px] bg-[#18181b] rounded-2xl p-10 flex flex-col items-center shadow-xl">
                     <h1 className="text-white text-2xl font-bold mb-2 text-center">Where Are You Currently Located?</h1>
-                    <p className="text-zinc-400 text-sm mb-8 text-center">Select a country. Don't worry you'll be able to change this later</p>
+                    <p className="text-zinc-400 text-sm mb-8 text-center">Select a country. Don&apos;t worry you&apos;ll be able to change this later</p>
                     <CountrySelect countries={COUNTRIES} value={country} onChange={setCountry} />
                     <ContinueButton
                         onClick={handleContinue}

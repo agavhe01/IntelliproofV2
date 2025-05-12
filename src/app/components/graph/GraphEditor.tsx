@@ -196,7 +196,8 @@ export default function GraphEditor() {
                 text: node.data.text,
                 belief: node.data.belief,
                 author: node.data.author,
-                created_on: node.data.created_on
+                created_on: node.data.created_on,
+                position: node.position
             })),
             edges: edges.map(edge => ({
                 id: edge.id,
@@ -262,10 +263,10 @@ export default function GraphEditor() {
 
     const handleSelectGraph = (graph: ArgumentGraph) => {
         console.log('Selecting graph:', graph);
-        const flowNodes: FlowNode<Node>[] = graph.nodes.map((node, index) => ({
+        const flowNodes: FlowNode<Node>[] = graph.nodes.map((node) => ({
             id: node.id,
             type: 'argument',
-            position: { x: 100 + index * 200, y: 100 },
+            position: node.position || { x: 100, y: 100 }, // Use saved position or default
             data: node,
         }));
 
@@ -649,6 +650,15 @@ export default function GraphEditor() {
                                             </span>
                                         </div>
                                     </div>
+                                    <button
+                                        onClick={() => {
+                                            setEdges((eds) => eds.filter((e) => e.id !== liveSelectedEdge.id));
+                                            setSelectedEdge(null);
+                                        }}
+                                        className="w-full bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 mt-4 text-sm"
+                                    >
+                                        Delete Edge
+                                    </button>
                                 </div>
                             </div>
                         )}

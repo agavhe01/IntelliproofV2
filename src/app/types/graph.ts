@@ -5,6 +5,7 @@ export interface Node {
     belief: number | null;
     author: string;
     created_on: string;
+    position?: { x: number; y: number };
 }
 
 export interface Edge {

@@ -574,12 +574,15 @@ export default function GraphEditor() {
                                         <label className="block text-sm font-medium text-gray-300 mb-1">
                                             Type
                                         </label>
-                                        <input
-                                            type="text"
-                                            value={selectedNode.data.type ?? ""}
-                                            readOnly
-                                            className="w-full bg-zinc-800 text-gray-400 px-3 py-2 rounded-lg border border-zinc-700"
-                                        />
+                                        <select
+                                            value={selectedNode.data.type}
+                                            onChange={(e) => updateNodeType(selectedNode.id, e.target.value as Node['type'])}
+                                            className="w-full bg-zinc-800 text-white px-3 py-2 rounded-lg border border-zinc-700 focus:outline-none focus:border-blue-500"
+                                        >
+                                            <option value="factual">Factual</option>
+                                            <option value="policy">Policy</option>
+                                            <option value="value">Value</option>
+                                        </select>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-300 mb-1">

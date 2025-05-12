@@ -61,7 +61,7 @@ export default function SigninForm() {
                 Sign In
             </ContinueButton>
             {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-            <p className="text-zinc-400 mt-6 text-center">Don't have an account? <a href="/signup" className="text-white underline">Sign Up</a></p>
+            <p className="text-zinc-400 mt-6 text-center">Don&apos;t have an account? <a href="/signup" className="text-white underline">Sign Up</a></p>
         </form>
     );
 } 

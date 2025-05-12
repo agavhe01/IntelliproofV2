@@ -3,6 +3,7 @@
 import styles from './Team.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faInstagram, faTwitter, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import Image from 'next/image';
 
 const Team = () => {
     return (
@@ -19,7 +20,7 @@ const Team = () => {
                     <label htmlFor="c-1" className={styles.item}>
                         <div className={styles.main_content}>
                             <div className={styles.img}>
-                                <img src="/images/pic1.avif" alt="John Doe" />
+                                <Image src="/images/pic1.avif" alt="John Doe" width={180} height={180} />
                             </div>
                             <div className={styles.content}>
                                 <h1>John Doe</h1>
@@ -46,7 +47,7 @@ const Team = () => {
                     <label htmlFor="c-2" className={styles.item}>
                         <div className={styles.main_content}>
                             <div className={styles.img}>
-                                <img src="/images/pic2.jpg" alt="Michael Lucas" />
+                                <Image src="/images/pic2.jpg" alt="Michael Lucas" width={180} height={180} />
                             </div>
                             <div className={styles.content}>
                                 <h1>Mike Lucas</h1>
@@ -73,7 +74,7 @@ const Team = () => {
                     <label htmlFor="c-3" className={styles.item}>
                         <div className={styles.main_content}>
                             <div className={styles.img}>
-                                <img src="/images/pic3.avif" alt="Henry Elijah" />
+                                <Image src="/images/pic3.avif" alt="Henry Elijah" width={180} height={180} />
                             </div>
                             <div className={styles.content}>
                                 <h1>Henry Elijah</h1>
@@ -100,7 +101,7 @@ const Team = () => {
                     <label htmlFor="c-4" className={styles.item}>
                         <div className={styles.main_content}>
                             <div className={styles.img}>
-                                <img src="/images/pic4.avif" alt="Alexander Leo" />
+                                <Image src="/images/pic4.avif" alt="Alexander Leo" width={180} height={180} />
                             </div>
                             <div className={styles.content}>
                                 <h1>Alex Leo</h1>
@@ -127,7 +128,7 @@ const Team = () => {
                     <label htmlFor="c-5" className={styles.item}>
                         <div className={styles.main_content}>
                             <div className={styles.img}>
-                                <img src="/images/pic5.avif" alt="David Joseph" />
+                                <Image src="/images/pic5.avif" alt="David Joseph" width={180} height={180} />
                             </div>
                             <div className={styles.content}>
                                 <h1>Dave Joseph</h1>

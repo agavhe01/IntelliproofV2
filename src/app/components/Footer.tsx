@@ -1,8 +1,22 @@
 import React from "react";
 
+interface UserMetadata {
+    first_name?: string;
+    last_name?: string;
+}
+
+interface User {
+    user_metadata: UserMetadata;
+}
+
+interface Profile {
+    first_name?: string;
+    last_name?: string;
+}
+
 interface FooterProps {
-    profile: any;
-    user: any;
+    profile: Profile;
+    user: User;
 }
 
 const Footer: React.FC<FooterProps> = ({ profile, user }) => {

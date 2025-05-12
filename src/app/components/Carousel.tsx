@@ -106,11 +106,12 @@ export default function Carousel() {
                         style={{ width: 120, height: 120 }}
                         aria-label={`Show ${img.alt}`}
                     >
-                        <img
+                        <Image
                             src={img.src}
                             alt={img.alt}
                             className="object-cover w-full h-full"
-                            style={{ width: 120, height: 120 }}
+                            width={120}
+                            height={120}
                         />
                     </button>
                 ))}

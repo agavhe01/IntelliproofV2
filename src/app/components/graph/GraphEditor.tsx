@@ -15,6 +15,7 @@ import { ArgumentNode } from './ArgumentNode';
 import { Node, Edge as ArgumentEdge, ArgumentGraph } from '../../types/graph';
 import { supabase } from '../../utils/supabase';
 import GraphManager from './GraphManager';
+import dagre from 'dagre';
 
 export default function GraphEditor() {
     console.log('GraphEditor component rendering');
@@ -187,41 +188,75 @@ export default function GraphEditor() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
+        // Ensure we're capturing the current state of nodes and edges
         const graphData: ArgumentGraph = {
-            nodes: nodes.map(node => node.data),
+            nodes: nodes.map(node => ({
+                id: node.id,
+                type: node.data.type,
+                text: node.data.text,
+                belief: node.data.belief,
+                author: node.data.author,
+                created_on: node.data.created_on
+            })),
             edges: edges.map(edge => ({
                 id: edge.id,
                 source: edge.source,
                 target: edge.target,
-                weight: (edge as any).weight || 0.5,
-            })),
+                weight: (edge as any).weight || 0.5
+            }))
         };
 
-        // Build the insert object
-        const insertObj: any = {
-            owner_email: user.email,
-            graph_data: graphData,
-            name: graphName,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        };
-        if (currentGraphId) {
-            insertObj.id = currentGraphId;
-        }
+        console.log('Saving graph data:', graphData); // Debug log
 
-        const { error, data } = await supabase
-            .from('graphs')
-            .upsert(insertObj)
-            .select();
+        try {
+            if (currentGraphId) {
+                // Update existing graph
+                const { error } = await supabase
+                    .from('graphs')
+                    .update({
+                        graph_data: graphData,
+                        name: graphName,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentGraphId)
+                    .eq('owner_email', user.email);
 
-        if (error) {
-            console.error('Error saving graph:', error);
-        } else {
-            console.log('Graph saved successfully', data);
-            if (data && data[0]) {
-                setCurrentGraphId(data[0].id);
+                if (error) {
+                    console.error('Error updating graph:', error);
+                    alert('Failed to update graph. Please try again.');
+                    return;
+                }
+                console.log('Graph updated successfully');
+            } else {
+                // Create new graph
+                const { error, data } = await supabase
+                    .from('graphs')
+                    .insert({
+                        owner_email: user.email,
+                        graph_data: graphData,
+                        name: graphName,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    })
+                    .select()
+                    .single();
+
+                if (error) {
+                    console.error('Error creating graph:', error);
+                    alert('Failed to create graph. Please try again.');
+                    return;
+                }
+
+                if (data) {
+                    setCurrentGraphId(data.id);
+                }
+                console.log('New graph created successfully');
             }
+
             setShowManager(true);
+        } catch (error) {
+            console.error('Error in saveGraph:', error);
+            alert('An error occurred while saving the graph.');
         }
     };
 
@@ -305,6 +340,93 @@ export default function GraphEditor() {
 
     const liveSelectedEdge = selectedEdge ? edges.find(e => e.id === selectedEdge.id) as ArgumentEdge : null;
 
+    // DAGRE LAYOUT FUNCTION
+    const applyAutoLayout = useCallback(() => {
+        const g = new dagre.graphlib.Graph();
+        g.setDefaultEdgeLabel(() => ({}));
+        g.setGraph({ rankdir: 'LR', nodesep: 100, ranksep: 100 });
+
+        nodes.forEach((node) => {
+            g.setNode(node.id, { width: 200, height: 100 });
+        });
+        edges.forEach((edge) => {
+            g.setEdge(edge.source, edge.target);
+        });
+        dagre.layout(g);
+        const newNodes = nodes.map((node) => {
+            const dagreNode = g.node(node.id);
+            return {
+                ...node,
+                position: dagreNode ? { x: dagreNode.x - 100, y: dagreNode.y - 50 } : node.position,
+            };
+        });
+        setNodes(newNodes);
+    }, [nodes, edges, setNodes]);
+
+    // FORCE-DIRECTED LAYOUT FUNCTION (simple, not physics-accurate)
+    const applyForceLayout = useCallback(() => {
+        const width = 800;
+        const height = 400;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const k = 200; // repulsion constant
+        const iterations = 100;
+        let nodePositions = nodes.map((n, i) => ({ ...n, fx: Math.random() * width, fy: Math.random() * height }));
+        for (let iter = 0; iter < iterations; iter++) {
+            // Repulsion
+            for (let i = 0; i < nodePositions.length; i++) {
+                for (let j = 0; j < nodePositions.length; j++) {
+                    if (i === j) continue;
+                    let dx = nodePositions[i].fx - nodePositions[j].fx;
+                    let dy = nodePositions[i].fy - nodePositions[j].fy;
+                    let dist = Math.sqrt(dx * dx + dy * dy) + 0.01;
+                    let repulse = k * k / dist;
+                    nodePositions[i].fx += (dx / dist) * repulse * 0.0001;
+                    nodePositions[i].fy += (dy / dist) * repulse * 0.0001;
+                }
+            }
+            // Attraction (edges)
+            edges.forEach(edge => {
+                const sourceIdx = nodePositions.findIndex(n => n.id === edge.source);
+                const targetIdx = nodePositions.findIndex(n => n.id === edge.target);
+                if (sourceIdx === -1 || targetIdx === -1) return;
+                let dx = nodePositions[targetIdx].fx - nodePositions[sourceIdx].fx;
+                let dy = nodePositions[targetIdx].fy - nodePositions[sourceIdx].fy;
+                let dist = Math.sqrt(dx * dx + dy * dy) + 0.01;
+                let attract = (dist * dist) / k;
+                nodePositions[sourceIdx].fx += (dx / dist) * attract * 0.0001;
+                nodePositions[sourceIdx].fy += (dy / dist) * attract * 0.0001;
+                nodePositions[targetIdx].fx -= (dx / dist) * attract * 0.0001;
+                nodePositions[targetIdx].fy -= (dy / dist) * attract * 0.0001;
+            });
+        }
+        // Center and scale
+        nodePositions = nodePositions.map(n => ({
+            ...n,
+            position: {
+                x: centerX + (n.fx - centerX) * 0.7,
+                y: centerY + (n.fy - centerY) * 0.7,
+            }
+        }));
+        setNodes(nodePositions.map(({ fx, fy, ...n }) => n));
+    }, [nodes, edges, setNodes]);
+
+    // CIRCULAR LAYOUT FUNCTION
+    const applyCircularLayout = useCallback(() => {
+        const radius = 250;
+        const centerX = 500;
+        const centerY = 300;
+        const angleStep = (2 * Math.PI) / nodes.length;
+        const newNodes = nodes.map((node, i) => ({
+            ...node,
+            position: {
+                x: centerX + radius * Math.cos(i * angleStep),
+                y: centerY + radius * Math.sin(i * angleStep),
+            }
+        }));
+        setNodes(newNodes);
+    }, [nodes, setNodes]);
+
     return (
         <div className="w-full h-full flex">
             <div className="flex-1 relative">
@@ -318,9 +440,27 @@ export default function GraphEditor() {
                         <div className="absolute top-4 right-4 z-10 flex gap-2">
                             <button
                                 onClick={() => setShowManager(true)}
-                                className="bg-zinc-700 text-white px-4 py-2 rounded-lg hover:bg-zinc-600"
+                                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
                             >
                                 Back to Graphs
+                            </button>
+                            <button
+                                onClick={applyAutoLayout}
+                                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                            >
+                                Auto Layout
+                            </button>
+                            <button
+                                onClick={applyForceLayout}
+                                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                            >
+                                Force Layout
+                            </button>
+                            <button
+                                onClick={applyCircularLayout}
+                                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                            >
+                                Circular Layout
                             </button>
                             <button
                                 onClick={saveGraph}
@@ -365,19 +505,19 @@ export default function GraphEditor() {
                             <div className="space-y-2">
                                 <button
                                     onClick={async () => await addNode('factual')}
-                                    className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                                    className="w-full bg-blue-500 text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 text-sm"
                                 >
                                     Add Factual Node
                                 </button>
                                 <button
                                     onClick={async () => await addNode('policy')}
-                                    className="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                                    className="w-full bg-green-500 text-white px-3 py-1.5 rounded-lg hover:bg-green-600 text-sm"
                                 >
                                     Add Policy Node
                                 </button>
                                 <button
                                     onClick={async () => await addNode('value')}
-                                    className="w-full bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600"
+                                    className="w-full bg-purple-500 text-white px-3 py-2 rounded-lg hover:bg-purple-600 text-sm"
                                 >
                                     Add Value Node
                                 </button>
@@ -445,21 +585,8 @@ export default function GraphEditor() {
                                             className="w-full bg-zinc-800 text-gray-400 px-3 py-2 rounded-lg border border-zinc-700"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-1">Created On</label>
-                                        <input
-                                            type="text"
-                                            value={
-                                                selectedNode.data.created_on && !isNaN(Date.parse(selectedNode.data.created_on))
-                                                    ? new Date(selectedNode.data.created_on).toLocaleString()
-                                                    : ""
-                                            }
-                                            readOnly
-                                            className="w-full bg-zinc-800 text-gray-400 px-3 py-2 rounded-lg border border-zinc-700"
-                                        />
-                                    </div>
                                     <button
-                                        className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 mt-4"
+                                        className="w-full bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 mt-4 text-sm"
                                         onClick={() => {
                                             setNodes((nds) => nds.filter((n) => n.id !== selectedNode.id));
                                             setEdges((eds) => eds.filter((e) => e.source !== selectedNode.id && e.target !== selectedNode.id));

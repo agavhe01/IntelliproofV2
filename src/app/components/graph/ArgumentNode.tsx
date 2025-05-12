@@ -98,12 +98,12 @@ export function ArgumentNode(props: ArgumentNodeProps) {
             `}</style>
             <div
                 className={`relative p-4 rounded-lg ${getNodeColor(data.type)} text-white min-w-[200px] transition-all duration-200 ${selected
-                        ? `ring-2 ring-[${getHighlightColor(data.type)}] shadow-lg shadow-[${getHighlightColor(data.type)}]/20 scale-105`
-                        : 'hover:ring-1 hover:ring-white/30'
+                    ? `ring-2 ring-[${getHighlightColor(data.type)}] shadow-lg shadow-[${getHighlightColor(data.type)}]/20 scale-110`
+                    : 'hover:ring-1 hover:ring-white/30'
                     } ${className ?? ''}`}
                 style={{
                     ...(style ?? {}),
-                    transform: selected ? 'scale(1.05)' : 'scale(1)',
+                    transform: selected ? 'scale(1.1)' : 'scale(1)',
                     transition: 'all 0.2s ease-in-out',
                     ...(selected ? {
                         '--tw-ring-color': getHighlightColor(data.type),

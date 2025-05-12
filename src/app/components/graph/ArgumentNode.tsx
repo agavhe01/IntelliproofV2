@@ -103,7 +103,7 @@ export function ArgumentNode(props: ArgumentNodeProps) {
                     } ${className ?? ''}`}
                 style={{
                     ...(style ?? {}),
-                    transform: selected ? 'scale(1.1)' : 'scale(1)',
+                    transform: selected ? 'scale(1.2)' : 'scale(1)',
                     transition: 'all 0.2s ease-in-out',
                     ...(selected ? {
                         '--tw-ring-color': getHighlightColor(data.type),

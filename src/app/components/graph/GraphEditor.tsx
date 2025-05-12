@@ -322,7 +322,7 @@ export default function GraphEditor() {
                 {...nodeProps}
                 data={nodeProps.data}
                 type="argument"
-                selected={false}
+                selected={!!(selectedNode && selectedNode.id === nodeProps.id)}
                 zIndex={0}
                 isConnectable={true}
                 xPos={0}
@@ -348,7 +348,7 @@ export default function GraphEditor() {
                 }}
             />
         ),
-    }), [setNodes]);
+    }), [setNodes, selectedNode]);
 
     const liveSelectedEdge = selectedEdge ? edges.find(e => e.id === selectedEdge.id) as ArgumentEdge : null;
 

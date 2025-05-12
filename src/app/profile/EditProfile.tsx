@@ -4,8 +4,25 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../utils/supabase";
 import { FaArrowLeft } from "react-icons/fa";
 import ContinueButton from "../components/ContinueButton";
+import Image from "next/image";
 
-export default function EditProfile({ profile, onSave }: { profile: any, onSave?: () => void }) {
+interface Profile {
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+    country?: string;
+    bio?: string;
+    created_at?: string;
+    last_login?: string;
+    account_type?: string;
+    twitter_url?: string;
+    linkedin_url?: string;
+    instagram_url?: string;
+    github_url?: string;
+}
+
+export default function EditProfile({ profile }: { profile: Profile }) {
     const router = useRouter();
     const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "");
     const [bio, setBio] = useState(profile?.bio || "");
@@ -75,7 +92,13 @@ export default function EditProfile({ profile, onSave }: { profile: any, onSave?
                     <div className="flex flex-col items-center gap-2">
                         <label htmlFor="avatar-upload" className="w-32 h-32 rounded-xl bg-zinc-700 flex items-center justify-center cursor-pointer">
                             {avatarUrl ? (
-                                <img src={avatarUrl} alt="Avatar" className="w-24 h-24 rounded-full object-cover" />
+                                <Image
+                                    src={avatarUrl}
+                                    alt="Avatar"
+                                    width={96}
+                                    height={96}
+                                    className="rounded-full object-cover"
+                                />
                             ) : (
                                 <span className="text-5xl text-zinc-400">+</span>
                             )}

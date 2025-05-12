@@ -73,7 +73,7 @@ export default function GraphEditor() {
                 .eq('email', user.email)
                 .single();
 
-            author = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || user.email : user.email;
+            author = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || user.email || 'Unknown Author' : user.email || 'Unknown Author';
         }
 
         const newNode: Node = {
@@ -317,13 +317,20 @@ export default function GraphEditor() {
     });
 
     const nodeTypes = useMemo(() => ({
-        argument: (nodeProps: any) => (
+        argument: (nodeProps: { id: string; data: Node }) => (
             <ArgumentNode
                 {...nodeProps}
                 data={nodeProps.data}
+                type="argument"
+                selected={false}
+                zIndex={0}
+                isConnectable={true}
+                xPos={0}
+                yPos={0}
+                dragging={false}
                 onTextChange={(text: string) => {
-                    setNodes((nds: any[]) =>
-                        nds.map((n: any) =>
+                    setNodes((nds: FlowNode<Node>[]) =>
+                        nds.map((n: FlowNode<Node>) =>
                             n.id === nodeProps.id
                                 ? { ...n, data: { ...n.data, text } }
                                 : n
@@ -331,8 +338,8 @@ export default function GraphEditor() {
                     );
                 }}
                 onBeliefChange={(belief: number) => {
-                    setNodes((nds: any[]) =>
-                        nds.map((n: any) =>
+                    setNodes((nds: FlowNode<Node>[]) =>
+                        nds.map((n: FlowNode<Node>) =>
                             n.id === nodeProps.id
                                 ? { ...n, data: { ...n.data, belief } }
                                 : n
@@ -353,16 +360,16 @@ export default function GraphEditor() {
         const centerY = height / 2;
         const k = 200; // repulsion constant
         const iterations = 100;
-        let nodePositions = nodes.map((n, i) => ({ ...n, fx: Math.random() * width, fy: Math.random() * height }));
+        const nodePositions = nodes.map(n => ({ ...n, fx: Math.random() * width, fy: Math.random() * height }));
         for (let iter = 0; iter < iterations; iter++) {
             // Repulsion
             for (let i = 0; i < nodePositions.length; i++) {
                 for (let j = 0; j < nodePositions.length; j++) {
                     if (i === j) continue;
-                    let dx = nodePositions[i].fx - nodePositions[j].fx;
-                    let dy = nodePositions[i].fy - nodePositions[j].fy;
-                    let dist = Math.sqrt(dx * dx + dy * dy) + 0.01;
-                    let repulse = k * k / dist;
+                    const dx = nodePositions[i].fx - nodePositions[j].fx;
+                    const dy = nodePositions[i].fy - nodePositions[j].fy;
+                    const dist = Math.sqrt(dx * dx + dy * dy) + 0.01;
+                    const repulse = k * k / dist;
                     nodePositions[i].fx += (dx / dist) * repulse * 0.0001;
                     nodePositions[i].fy += (dy / dist) * repulse * 0.0001;
                 }
@@ -372,10 +379,10 @@ export default function GraphEditor() {
                 const sourceIdx = nodePositions.findIndex(n => n.id === edge.source);
                 const targetIdx = nodePositions.findIndex(n => n.id === edge.target);
                 if (sourceIdx === -1 || targetIdx === -1) return;
-                let dx = nodePositions[targetIdx].fx - nodePositions[sourceIdx].fx;
-                let dy = nodePositions[targetIdx].fy - nodePositions[sourceIdx].fy;
-                let dist = Math.sqrt(dx * dx + dy * dy) + 0.01;
-                let attract = (dist * dist) / k;
+                const dx = nodePositions[targetIdx].fx - nodePositions[sourceIdx].fx;
+                const dy = nodePositions[targetIdx].fy - nodePositions[sourceIdx].fy;
+                const dist = Math.sqrt(dx * dx + dy * dy) + 0.01;
+                const attract = (dist * dist) / k;
                 nodePositions[sourceIdx].fx += (dx / dist) * attract * 0.0001;
                 nodePositions[sourceIdx].fy += (dy / dist) * attract * 0.0001;
                 nodePositions[targetIdx].fx -= (dx / dist) * attract * 0.0001;

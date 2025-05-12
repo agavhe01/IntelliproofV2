@@ -9,6 +9,31 @@ import AnimatedText from "../components/AnimatedText";
 import Services from '../components/Services';
 import Team from '../components/Team';
 
+interface Profile {
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+    country?: string;
+    bio?: string;
+    created_at?: string;
+    last_login?: string;
+    account_type?: string;
+    twitter_url?: string;
+    linkedin_url?: string;
+    instagram_url?: string;
+    github_url?: string;
+}
+
+interface User {
+    id: string;
+    email?: string;
+    user_metadata?: {
+        first_name?: string;
+        last_name?: string;
+    };
+}
+
 const NAV_ITEMS = [
     { key: "home", label: "Home", icon: null },
     { key: "graph", label: "Graph Editor", icon: null },
@@ -23,8 +48,8 @@ const GraphEditor = dynamic(() => import("../components/graph/GraphEditor"), {
 });
 
 export default function HomePage() {
-    const [user, setUser] = useState<any>(null);
-    const [profile, setProfile] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
     const [selectedTab, setSelectedTab] = useState("home");
 
     useEffect(() => {

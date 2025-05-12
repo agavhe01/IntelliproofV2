@@ -7,22 +7,33 @@ import { format } from "date-fns";
 import { FaEdit, FaSignOutAlt, FaTwitter, FaLinkedin, FaInstagram, FaGithub } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
-const ProjectCard = ({ graph }: { graph: any }) => {
-    const lastModified = graph.updated_at || graph.created_at;
-    return (
-        <div className="bg-zinc-800 rounded-xl p-4 hover:bg-zinc-700 transition-colors duration-200">
-            <div className="aspect-video bg-zinc-900 rounded-lg mb-3 flex items-center justify-center">
-                <div className="text-zinc-500 text-sm">Graph Preview</div>
-            </div>
-            <h3 className="font-medium text-white mb-1 truncate">{graph.title || "Untitled Graph"}</h3>
-            <p className="text-zinc-400 text-sm">Modified: {format(new Date(lastModified), "MMM d, yyyy")}</p>
-        </div>
-    );
-};
+interface Profile {
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+    country?: string;
+    bio?: string;
+    created_at?: string;
+    last_login?: string;
+    account_type?: string;
+    twitter_url?: string;
+    linkedin_url?: string;
+    instagram_url?: string;
+    github_url?: string;
+}
+
+interface Graph {
+    title?: string;
+    created_at: string;
+    updated_at?: string;
+    graph_data: Record<string, unknown>;
+    owner_email: string;
+}
 
 export default function ProfilePage() {
-    const [profile, setProfile] = useState<any>(null);
-    const [graphs, setGraphs] = useState<any[]>([]);
+    const [profile, setProfile] = useState<Profile | null>(null);
+    const [graphs, setGraphs] = useState<Graph[]>([]);
     const [storageUsage, setStorageUsage] = useState<number>(0);
     const [loading, setLoading] = useState(true);
     const router = useRouter();

@@ -4,8 +4,24 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../utils/supabase";
 import EditProfile from "../EditProfile";
 
+interface Profile {
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+    country?: string;
+    bio?: string;
+    created_at?: string;
+    last_login?: string;
+    account_type?: string;
+    twitter_url?: string;
+    linkedin_url?: string;
+    instagram_url?: string;
+    github_url?: string;
+}
+
 export default function EditProfilePage() {
-    const [profile, setProfile] = useState<any>(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 

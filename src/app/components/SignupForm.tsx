@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import ContinueButton from "./ContinueButton";
 import Input from "./Input";
 import { useRouter } from "next/navigation";
@@ -91,9 +90,9 @@ export default function SignupForm() {
 
             setSuccess('Account created successfully! Please check your email to verify your account.');
             router.push("/onboarding1");
-        } catch (error: any) {
+        } catch (error: Error | unknown) {
             console.error('Signup error:', error);
-            setError(error.message || 'An error occurred during signup');
+            setError(error instanceof Error ? error.message : 'An error occurred during signup');
         } finally {
             setLoading(false);
         }

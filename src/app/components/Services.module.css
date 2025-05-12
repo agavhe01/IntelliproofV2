@@ -1,13 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins');
 
-:root {
-    --colorEven: #333333;
-    --colorOdd: #666666;
-    --colorHover: #000000;
-    --colorText: #ffffff;
-    --colorBackground: #1a1a1a;
-}
-
 .container {
     width: 100%;
     max-width: 1200px;

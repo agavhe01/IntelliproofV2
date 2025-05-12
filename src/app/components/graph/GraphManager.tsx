@@ -23,6 +23,7 @@ export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManager
     const [graphs, setGraphs] = useState<GraphData[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedGraph, setSelectedGraph] = useState<GraphData | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         console.log('GraphManager mounted');
@@ -72,6 +73,35 @@ export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManager
             };
             onSelectGraph(graphWithName);
             setSelectedGraph(null);
+        }
+    };
+
+    const handleDeleteGraph = async (graphId: string) => {
+        if (!confirm('Are you sure you want to delete this graph? This action cannot be undone.')) {
+            return;
+        }
+
+        setIsDeleting(true);
+        try {
+            const { error } = await supabase
+                .from('graphs')
+                .delete()
+                .eq('id', graphId);
+
+            if (error) {
+                console.error('Error deleting graph:', error);
+                alert('Failed to delete graph. Please try again.');
+                return;
+            }
+
+            // Remove the deleted graph from the local state
+            setGraphs(graphs.filter(g => g.id !== graphId));
+            setSelectedGraph(null);
+        } catch (error) {
+            console.error('Error in handleDeleteGraph:', error);
+            alert('An error occurred while deleting the graph.');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -162,6 +192,13 @@ export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManager
                                             className="px-2 py-1 bg-gray-200 text-black dark:bg-black dark:border-black dark:text-white border border-gray-300 rounded-md text-sm w-28"
                                         >
                                             Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => selectedGraph && handleDeleteGraph(selectedGraph.id)}
+                                            disabled={isDeleting}
+                                            className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm w-28 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isDeleting ? 'Deleting...' : 'Delete'}
                                         </button>
                                         <button
                                             onClick={handleOpenGraph}

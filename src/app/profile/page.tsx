@@ -4,8 +4,21 @@ import { supabase } from "../utils/supabase";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
-import { FaEdit, FaSignOutAlt } from "react-icons/fa";
+import { FaEdit, FaSignOutAlt, FaTwitter, FaLinkedin, FaInstagram, FaGithub } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+
+const ProjectCard = ({ graph }: { graph: any }) => {
+    const lastModified = graph.updated_at || graph.created_at;
+    return (
+        <div className="bg-zinc-800 rounded-xl p-4 hover:bg-zinc-700 transition-colors duration-200">
+            <div className="aspect-video bg-zinc-900 rounded-lg mb-3 flex items-center justify-center">
+                <div className="text-zinc-500 text-sm">Graph Preview</div>
+            </div>
+            <h3 className="font-medium text-white mb-1 truncate">{graph.title || "Untitled Graph"}</h3>
+            <p className="text-zinc-400 text-sm">Modified: {format(new Date(lastModified), "MMM d, yyyy")}</p>
+        </div>
+    );
+};
 
 export default function ProfilePage() {
     const [profile, setProfile] = useState<any>(null);
@@ -126,17 +139,13 @@ export default function ProfilePage() {
                         <p>{lastActive}</p>
                     </div>
                     <div className="bg-zinc-800 rounded-lg p-4 col-span-2">
-                        <p className="font-semibold mb-2">Recent Graphs</p>
-                        <ul className="flex gap-4">
-                            {graphs.slice(0, 5).map((g) => (
-                                <li key={g.id} className="bg-zinc-700 rounded p-2 min-w-[100px]">
-                                    <div className="font-medium truncate">{g.title || "Untitled"}</div>
-                                    {/* Thumbnail placeholder */}
-                                    <div className="w-full h-12 bg-zinc-600 rounded mt-2 flex items-center justify-center text-xs text-zinc-300">Thumbnail</div>
-                                </li>
+                        <p className="font-semibold mb-4">Recent Graphs</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {graphs.slice(0, 6).map((g) => (
+                                <ProjectCard key={g.id} graph={g} />
                             ))}
-                            {graphs.length === 0 && <li className="text-zinc-400">No graphs yet.</li>}
-                        </ul>
+                            {graphs.length === 0 && <p className="text-zinc-400 col-span-full">No graphs yet.</p>}
+                        </div>
                     </div>
                     <div className="bg-zinc-800 rounded-lg p-4 col-span-2">
                         <p className="font-semibold">Storage Used</p>
@@ -154,11 +163,32 @@ export default function ProfilePage() {
                 <div className="bg-zinc-800 rounded-lg p-4 flex flex-col gap-4">
                     <p className="font-semibold">Social Links</p>
                     <div className="flex gap-4">
-                        {profile.twitter_url && <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer" className="underline">Twitter</a>}
-                        {profile.linkedin_url && <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="underline">LinkedIn</a>}
-                        {profile.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" className="underline">Instagram</a>}
+                        {profile.twitter_url && (
+                            <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer"
+                                className="bg-zinc-900 p-3 rounded-full hover:bg-zinc-700 transition-colors group">
+                                <FaTwitter className="text-[#1DA1F2] text-xl group-hover:scale-110 transition-transform" />
+                            </a>
+                        )}
+                        {profile.linkedin_url && (
+                            <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer"
+                                className="bg-zinc-900 p-3 rounded-full hover:bg-zinc-700 transition-colors group">
+                                <FaLinkedin className="text-[#0077B5] text-xl group-hover:scale-110 transition-transform" />
+                            </a>
+                        )}
+                        {profile.instagram_url && (
+                            <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer"
+                                className="bg-zinc-900 p-3 rounded-full hover:bg-zinc-700 transition-colors group">
+                                <FaInstagram className="text-[#E4405F] text-xl group-hover:scale-110 transition-transform" />
+                            </a>
+                        )}
+                        {profile.github_url && (
+                            <a href={profile.github_url} target="_blank" rel="noopener noreferrer"
+                                className="bg-zinc-900 p-3 rounded-full hover:bg-zinc-700 transition-colors group">
+                                <FaGithub className="text-white text-xl group-hover:scale-110 transition-transform" />
+                            </a>
+                        )}
                     </div>
-                    <p className="mt-2">Public Profile: <Link href={publicProfileUrl} className="underline">{publicProfileUrl}</Link></p>
+                    <p className="mt-2">Public Profile: <Link href={publicProfileUrl} className="text-blue-400 hover:text-blue-300">{publicProfileUrl}</Link></p>
                     <p className="font-semibold mt-4 mb-2">Previous Collaborators</p>
                     <div className="flex gap-4 flex-wrap">
                         {mockCollaborators.map((collab, idx) => (

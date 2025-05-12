@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import Carousel from "../components/Carousel";
 import AnimatedText from "../components/AnimatedText";
 import Services from '../components/Services';
+import Team from '../components/Team';
 
 const NAV_ITEMS = [
     { key: "home", label: "Home", icon: null },
@@ -108,6 +109,9 @@ export default function HomePage() {
                         </div>
                         <div className="px-8 pb-8">
                             <Services />
+                        </div>
+                        <div className="px-8 pb-8">
+                            <Team />
                         </div>
                     </div>
                 )}

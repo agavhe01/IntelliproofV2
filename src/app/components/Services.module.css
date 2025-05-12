@@ -154,3 +154,16 @@
     color: var(--colorText);
     transform: .5s;
 }
+
+.servicesSection {
+    width: 100%;
+    padding: 2rem 0;
+}
+
+.header {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #ffffff;
+    margin-bottom: 3rem;
+    font-weight: 600;
+}

@@ -261,7 +261,7 @@ export default function GraphEditor() {
         }
     };
 
-    const handleSelectGraph = (graph: ArgumentGraph) => {
+    const handleSelectGraph = (graph: ArgumentGraph & { id?: string }) => {
         console.log('Selecting graph:', graph);
         const flowNodes: FlowNode<Node>[] = graph.nodes.map((node) => ({
             id: node.id,
@@ -283,6 +283,7 @@ export default function GraphEditor() {
         setNodes(flowNodes);
         setEdges(flowEdges);
         setGraphName(graph.name || 'Untitled Graph');
+        setCurrentGraphId(graph.id || null);  // Set the current graph ID
         setShowManager(false);
     };
 

@@ -69,7 +69,8 @@ export default function GraphManager({ onSelectGraph, onNewGraph }: GraphManager
         if (selectedGraph) {
             const graphWithName = {
                 ...selectedGraph.graph_data,
-                name: selectedGraph.name
+                name: selectedGraph.name,
+                id: selectedGraph.id
             };
             onSelectGraph(graphWithName);
             setSelectedGraph(null);
